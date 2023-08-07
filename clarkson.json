@@ -1,0 +1,164 @@
+[
+    {
+        "Date": "20230624 19:00:00",
+        "World Seaborne Trade": {
+            "value": 12.2,
+            "unit": "bt"
+        },
+        "World Seaborne Trade YoY": {
+            "value": 1.8,
+            "unit": "%Yr/Yr"
+        },
+        "ClarkSea Index": {
+            "value": 21749.0,
+            "unit": "$/day"
+        },
+        "Newbuild Price Index": {
+            "value": 170.9,
+            "unit": "index"
+        },
+        "CO2 Emissions": {
+            "value": 821.9,
+            "unit": "MillionTonnes"
+        },
+        "Container Port Congestion Index": {
+            "value": 31.0,
+            "unit": "%"
+        }
+    },
+    {
+        "Date": "20230708 19:00:00",
+        "World Seaborne Trade": {
+            "value": 12.3,
+            "unit": "bt"
+        },
+        "World Seaborne Trade YoY": {
+            "value": 2.3,
+            "unit": "%Yr/Yr"
+        },
+        "ClarkSea Index": {
+            "value": 20018.0,
+            "unit": "$/day"
+        },
+        "Newbuild Price Index": {
+            "value": 171.3,
+            "unit": "index"
+        },
+        "CO2 Emissions": {
+            "value": 837.7,
+            "unit": "MillionTonnes"
+        },
+        "Container Port Congestion Index": {
+            "value": 31.3,
+            "unit": "%"
+        }
+    },
+    {
+        "Date": "20230715 19:00:00",
+        "World Seaborne Trade": {
+            "value": 12.3,
+            "unit": "bt"
+        },
+        "World Seaborne Trade YoY": {
+            "value": 2.3,
+            "unit": "%Yr/Yr"
+        },
+        "ClarkSea Index": {
+            "value": 20090.0,
+            "unit": "$/day"
+        },
+        "Newbuild Price Index": {
+            "value": 171.6,
+            "unit": "index"
+        },
+        "CO2 Emissions": {
+            "value": 837.7,
+            "unit": "MillionTonnes"
+        },
+        "Container Port Congestion Index": {
+            "value": 32.0,
+            "unit": "%"
+        }
+    },
+    {
+        "Date": "20230722 19:00:00",
+        "World Seaborne Trade": {
+            "value": 12.3,
+            "unit": "bt"
+        },
+        "World Seaborne Trade YoY": {
+            "value": 2.3,
+            "unit": "%Yr/Yr"
+        },
+        "ClarkSea Index": {
+            "value": 19972.0,
+            "unit": "$/day"
+        },
+        "Newbuild Price Index": {
+            "value": 172.1,
+            "unit": "index"
+        },
+        "CO2 Emissions": {
+            "value": 837.7,
+            "unit": "MillionTonnes"
+        },
+        "Container Port Congestion Index": {
+            "value": 30.7,
+            "unit": "%"
+        }
+    },
+    {
+        "Date": "20230729 19:00:00",
+        "World Seaborne Trade": {
+            "value": 12.3,
+            "unit": "bt"
+        },
+        "World Seaborne Trade YoY": {
+            "value": 2.3,
+            "unit": "%Yr/Yr"
+        },
+        "ClarkSea Index": {
+            "value": 19846.0,
+            "unit": "$/day"
+        },
+        "Newbuild Price Index": {
+            "value": 172.4,
+            "unit": "index"
+        },
+        "CO2 Emissions": {
+            "value": 837.7,
+            "unit": "MillionTonnes"
+        },
+        "Container Port Congestion Index": {
+            "value": 31.0,
+            "unit": "%"
+        }
+    },
+    {
+        "Date": "20230805 19:00:00",
+        "World Seaborne Trade": {
+            "value": 12.3,
+            "unit": "bt"
+        },
+        "World Seaborne Trade YoY": {
+            "value": 2.4,
+            "unit": "%Yr/Yr"
+        },
+        "ClarkSea Index": {
+            "value": 18989.0,
+            "unit": "$/day"
+        },
+        "Newbuild Price Index": {
+            "value": 172.6,
+            "unit": "index"
+        },
+        "CO2 Emissions": {
+            "value": 837.7,
+            "unit": "MillionTonnes"
+        },
+        "Container Port Congestion Index": {
+            "value": 29.9,
+            "unit": "%"
+        }
+    }
+]
