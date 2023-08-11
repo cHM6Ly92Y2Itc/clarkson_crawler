@@ -1,164 +1,196 @@
-[
-    {
-        "Date": "20230624 19:00:00",
-        "World Seaborne Trade": {
-            "value": 12.2,
-            "unit": "bt"
-        },
-        "World Seaborne Trade YoY": {
-            "value": 1.8,
-            "unit": "%Yr/Yr"
-        },
-        "ClarkSea Index": {
-            "value": 21749.0,
-            "unit": "$/day"
-        },
-        "Newbuild Price Index": {
-            "value": 170.9,
-            "unit": "index"
-        },
-        "CO2 Emissions": {
-            "value": 821.9,
-            "unit": "MillionTonnes"
-        },
-        "Container Port Congestion Index": {
-            "value": 31.0,
-            "unit": "%"
-        }
+{
+    "World Seaborne Trade": {
+        "unit": "bt",
+        "data": [
+            {
+                "date": "20230624 18:00:00",
+                "value": 12.2
+            },
+            {
+                "date": "20230708 18:00:00",
+                "value": 12.3
+            },
+            {
+                "date": "20230715 18:00:00",
+                "value": 12.3
+            },
+            {
+                "date": "20230722 18:00:00",
+                "value": 12.3
+            },
+            {
+                "date": "20230729 18:00:00",
+                "value": 12.3
+            },
+            {
+                "date": "20230805 18:00:00",
+                "value": 12.3
+            }
+        ]
     },
-    {
-        "Date": "20230708 19:00:00",
-        "World Seaborne Trade": {
-            "value": 12.3,
-            "unit": "bt"
-        },
-        "World Seaborne Trade YoY": {
-            "value": 2.3,
-            "unit": "%Yr/Yr"
-        },
-        "ClarkSea Index": {
-            "value": 20018.0,
-            "unit": "$/day"
-        },
-        "Newbuild Price Index": {
-            "value": 171.3,
-            "unit": "index"
-        },
-        "CO2 Emissions": {
-            "value": 837.7,
-            "unit": "MillionTonnes"
-        },
-        "Container Port Congestion Index": {
-            "value": 31.3,
-            "unit": "%"
-        }
+    "World Seaborne Trade YoY": {
+        "unit": "%",
+        "data": [
+            {
+                "date": "20230624 18:00:00",
+                "value": 1.8
+            },
+            {
+                "date": "20230708 18:00:00",
+                "value": 2.3
+            },
+            {
+                "date": "20230715 18:00:00",
+                "value": 2.3
+            },
+            {
+                "date": "20230722 18:00:00",
+                "value": 2.3
+            },
+            {
+                "date": "20230729 18:00:00",
+                "value": 2.3
+            },
+            {
+                "date": "20230805 18:00:00",
+                "value": 2.4
+            }
+        ]
     },
-    {
-        "Date": "20230715 19:00:00",
-        "World Seaborne Trade": {
-            "value": 12.3,
-            "unit": "bt"
-        },
-        "World Seaborne Trade YoY": {
-            "value": 2.3,
-            "unit": "%Yr/Yr"
-        },
-        "ClarkSea Index": {
-            "value": 20090.0,
-            "unit": "$/day"
-        },
-        "Newbuild Price Index": {
-            "value": 171.6,
-            "unit": "index"
-        },
-        "CO2 Emissions": {
-            "value": 837.7,
-            "unit": "MillionTonnes"
-        },
-        "Container Port Congestion Index": {
-            "value": 32.0,
-            "unit": "%"
-        }
+    "ClarkSea Index": {
+        "unit": "$/day",
+        "data": [
+            {
+                "date": "20230624 18:00:00",
+                "value": 21749
+            },
+            {
+                "date": "20230708 18:00:00",
+                "value": 20018
+            },
+            {
+                "date": "20230715 18:00:00",
+                "value": 20090
+            },
+            {
+                "date": "20230722 18:00:00",
+                "value": 19972
+            },
+            {
+                "date": "20230729 18:00:00",
+                "value": 19846
+            },
+            {
+                "date": "20230805 18:00:00",
+                "value": 18989
+            }
+        ]
     },
-    {
-        "Date": "20230722 19:00:00",
-        "World Seaborne Trade": {
-            "value": 12.3,
-            "unit": "bt"
-        },
-        "World Seaborne Trade YoY": {
-            "value": 2.3,
-            "unit": "%Yr/Yr"
-        },
-        "ClarkSea Index": {
-            "value": 19972.0,
-            "unit": "$/day"
-        },
-        "Newbuild Price Index": {
-            "value": 172.1,
-            "unit": "index"
-        },
-        "CO2 Emissions": {
-            "value": 837.7,
-            "unit": "MillionTonnes"
-        },
-        "Container Port Congestion Index": {
-            "value": 30.7,
-            "unit": "%"
-        }
+    "Newbuild Price Index": {
+        "unit": "index",
+        "data": [
+            {
+                "date": "20230624 18:00:00",
+                "value": 170.9
+            },
+            {
+                "date": "20230708 18:00:00",
+                "value": 171.3
+            },
+            {
+                "date": "20230715 18:00:00",
+                "value": 171.6
+            },
+            {
+                "date": "20230722 18:00:00",
+                "value": 172.1
+            },
+            {
+                "date": "20230729 18:00:00",
+                "value": 172.4
+            },
+            {
+                "date": "20230805 18:00:00",
+                "value": 172.6
+            }
+        ]
     },
-    {
-        "Date": "20230729 19:00:00",
-        "World Seaborne Trade": {
-            "value": 12.3,
-            "unit": "bt"
-        },
-        "World Seaborne Trade YoY": {
-            "value": 2.3,
-            "unit": "%Yr/Yr"
-        },
-        "ClarkSea Index": {
-            "value": 19846.0,
-            "unit": "$/day"
-        },
-        "Newbuild Price Index": {
-            "value": 172.4,
-            "unit": "index"
-        },
-        "CO2 Emissions": {
-            "value": 837.7,
-            "unit": "MillionTonnes"
-        },
-        "Container Port Congestion Index": {
-            "value": 31.0,
-            "unit": "%"
-        }
+    "CO2 Emissions": {
+        "unit": "Million Tonnes",
+        "data": [
+            {
+                "date": "20230624 18:00:00",
+                "value": 821.9
+            },
+            {
+                "date": "20230708 18:00:00",
+                "value": 837.7
+            },
+            {
+                "date": "20230715 18:00:00",
+                "value": 837.7
+            },
+            {
+                "date": "20230722 18:00:00",
+                "value": 837.7
+            },
+            {
+                "date": "20230729 18:00:00",
+                "value": 837.7
+            },
+            {
+                "date": "20230805 18:00:00",
+                "value": 837.7
+            }
+        ]
     },
-    {
-        "Date": "20230805 19:00:00",
-        "World Seaborne Trade": {
-            "value": 12.3,
-            "unit": "bt"
-        },
-        "World Seaborne Trade YoY": {
-            "value": 2.4,
-            "unit": "%Yr/Yr"
-        },
-        "ClarkSea Index": {
-            "value": 18989.0,
-            "unit": "$/day"
-        },
-        "Newbuild Price Index": {
-            "value": 172.6,
-            "unit": "index"
-        },
-        "CO2 Emissions": {
-            "value": 837.7,
-            "unit": "MillionTonnes"
-        },
-        "Container Port Congestion Index": {
-            "value": 29.9,
-            "unit": "%"
-        }
+    "Container Port Congestion Index": {
+        "unit": "%",
+        "data": [
+            {
+                "date": "20230624 18:00:00",
+                "value": 31.0
+            },
+            {
+                "date": "20230708 18:00:00",
+                "value": 31.3
+            },
+            {
+                "date": "20230715 18:00:00",
+                "value": 32.0
+            },
+            {
+                "date": "20230722 18:00:00",
+                "value": 30.7
+            },
+            {
+                "date": "20230729 18:00:00",
+                "value": 31.0
+            },
+            {
+                "date": "20230805 18:00:00",
+                "value": 29.9
+            },
+            {
+                "date": "20230807 18:00:04",
+                "value": 29.8
+            },
+            {
+                "date": "20230808 18:00:05",
+                "value": 30.1
+            },
+            {
+                "date": "20230809 18:00:06",
+                "value": 30.6
+            },
+            {
+                "date": "20230810 18:00:06",
+                "value": 30.6
+            },
+            {
+                "date": "20230811 18:00:04",
+                "value": 31.2
+            }
+        ]
     }
-]
+}
