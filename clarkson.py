@@ -15,7 +15,7 @@ class clarkson:
         self.data_path = "clarkson.json"
         #指定生成的图表路径(可选,应当设置为目录路径,默认生成在工作目录)
         self.graph_path = "."
-        #自行设置代理
+        #自行设置代理,支持socks或http代理,如http://127.0.0.1:7890
         self.proxy = ""
         self.header = {
             "User-Agent":
@@ -145,19 +145,25 @@ class clarkson:
 
         #生成折线图
         def gen_graph(date: list, value: list, title: str, unit: str) -> None:
-            plt.plot(date, value, "k.-", label=title + ": " + unit)
+            #为了使图表x轴不过于拥挤,使用了截短的日期,但这会导致x轴出现重复值导致图表出错
+            #故使用一个等长的元素不重复列表xmask替代日期作为x轴的值,并使用xsticks函数将日期作为label替代原x轴的值显示在x轴上
+            #从而解决此问题
+            xmask = []
+            for i in range(32, len(date) + 32):
+                xmask.append(str(i))
+            plt.plot(xmask, value, "k.-", label=title + ": " + unit)
             plt.title(title)
             plt.xlabel("Date")
             plt.grid(True)
             plt.legend(loc="best", frameon=False)
-            for x, y in zip(date, value):
+            for x, y in zip(xmask, value):
                 plt.annotate(str(y),
                              xy=(x, y),
                              textcoords='data',
                              va='baseline',
                              ha='right')
             plt.tight_layout()
-            plt.xticks(rotation=-30)
+            plt.xticks(xmask, date, rotation=-30)
             plt.savefig(os.path.join(self.graph_path, title + ".png"),
                         bbox_inches='tight')
             plt.close()
@@ -179,6 +185,7 @@ class clarkson:
                 gen_graph(date, values, key, unit)
 
         #处理World Seaborne Trade数据
+
         date1 = []
         value1 = []
         unit1 = data["World Seaborne Trade"]["unit"]
@@ -197,15 +204,22 @@ class clarkson:
             value2.append(item["value"])
         date2 = date_format(date2)
 
+        xmask1 = []
+        xmask2 = []
+        for i in range(32, len(date1) + 32):
+            xmask1.append(str(i))
+        for i in range(32, len(date2) + 32):
+            xmask2.append(str(i))
+
         #画图
         fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True)
         fig.suptitle("World Seaborne Trade")
-        ax1.plot(date1,
+        ax1.plot(xmask1,
                  value1,
                  "k.-",
                  label="World Seaborne Trade" + ": " + unit1)
         ax1.set_ylabel("value/bt")
-        for x, y in zip(date1, value1):
+        for x, y in zip(xmask1, value1):
             ax1.annotate(str(y),
                          xy=(x, y),
                          textcoords='data',
@@ -213,10 +227,10 @@ class clarkson:
                          ha='right')
         ax1.grid(True)
 
-        ax2.plot(date2, value2, "k.-", label="YoY" + ": " + unit2)
+        ax2.plot(xmask2, value2, "k.-", label="YoY" + ": " + unit2)
         ax2.set_xlabel("Date")
         ax2.set_ylabel("YoY/%")
-        for x, y in zip(date2, value2):
+        for x, y in zip(xmask2, value2):
             ax2.annotate(str(y),
                          xy=(x, y),
                          textcoords='data',
@@ -224,7 +238,7 @@ class clarkson:
                          ha='right')
         ax2.grid(True)
 
-        plt.xticks(rotation=-30)
+        plt.xticks(xmask2, date2, rotation=-30)
         fig.tight_layout()
         fig.savefig(os.path.join(self.graph_path,
                                  "World Seaborne Trade" + ".png"),
