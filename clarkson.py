@@ -13,11 +13,11 @@ class clarkson:
     def __init__(self) -> None:
         self.URL = "https://sin.clarksons.net/home/GetHomeLinksSearch?homeLinkType=2&page=1&pageSize=100&search="
         #指定数据文件保存路径(可选,应当设置为文件路径,默认为工作目录下的clarkson.json文件)
-        self.data_path = "./data"
+        self.data_path = "data"
         #指定生成的图表路径(可选,应当设置为目录路径,默认生成在工作目录)
-        self.graph_path = "./graph"
+        self.graph_path = "graph"
         #自行设置代理,支持socks或http代理,如http://127.0.0.1:7890
-        self.proxy = ""
+        self.proxy = "http://127.0.0.1:7890"
         self.header = {
             "User-Agent":
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36 Edg/116.0.0.0"
@@ -49,8 +49,12 @@ class clarkson:
             else:
                 data = json.loads(requests.get(self.URL, headers=self.header).text)
         except:
-            print("request get error")
-            os._exit(1)
+            print("request get error, retry without proxy ...")
+            try:
+                data = json.loads(requests.get(self.URL, headers=self.header).text)
+            except:
+                print("request get error, exit")
+                os._exit(1)
 
         return [
             parser(data["Results"][0]["Title"]),
@@ -60,7 +64,7 @@ class clarkson:
             parser(data["Results"][4]["Title"]),
             parser(data["Results"][5]["Title"])]
 
-    def check_update(self,label,lastdate:str,newdate:str,lastvalue,newvalue,interval:int)->bool:
+    def check_update(self,label,lastdate:str,newdate:str,lastvalue,newvalue,interval:int)->tuple[bool,bool]:
         last = datetime.strptime(lastdate, r"%Y%m%d")
         new = datetime.strptime(newdate, r"%Y%m%d")
         td = timedelta(days=interval)
@@ -84,10 +88,10 @@ class clarkson:
                 print(f"[{label}]lastdate: {lastdate} newdate: {newdate}, no update")
 
             if lastvalue != newvalue:
-                print(f"[{label}]{newvalue} -> {lastvalue}, updating...")
+                print(f"[{label}]{lastvalue} -> {newvalue}, updating...")
                 ret2 = True
 
-        return ret1 or ret2
+        return (ret1,ret2)
     def save_data(self) -> None:
         # 读取已保存数据
         congestion_idx = pd.read_csv(os.path.join(self.data_path,"container_port_congestion_idx.csv"))
@@ -106,18 +110,23 @@ class clarkson:
         last_row = congestion_idx.iloc[-1].tolist()
         last_date = str(int(last_row[0]))
         last_value = last_row[1]
-        if self.check_update("congestion_idx",last_date,date,last_value,new[5],1):
-            new_df = pd.DataFrame({"date":date,"container_port_congestion_idx":new[5]},index=[0])
+        update = self.check_update("congestion_idx",last_date,date,last_value,new[5],1)
+        if update[0]:
+            new_df = pd.DataFrame({"date":int(date),"container_port_congestion_idx":new[5]},index=[0])
             congestion_idx=pd.concat([congestion_idx,new_df],ignore_index=True)
             congestion_idx.to_csv(os.path.join(self.data_path,"container_port_congestion_idx.csv"),index=False)
-            
+        elif update[1]:
+            new_df = pd.DataFrame({"date":int(date),"container_port_congestion_idx":new[5]},index=[0])
+            congestion_idx.iloc[-1] = new_df
+            congestion_idx.to_csv(os.path.join(self.data_path,"container_port_congestion_idx.csv"),index=False)
         # 处理其他数据
         label = ["World Seaborne Trade","World Seaborne Trade YoY","ClarkSea Index","Newbuild Price Index","CO2 Emissions"]
         last_row = other_data.iloc[-1].tolist()
         last_date = str(int(last_row[0]))
         last_value = last_row[1:]
-        if self.check_update(label,last_date,date,last_value,new[0:5],8):
-            new_df = pd.DataFrame({'date':[date],
+        update = self.check_update(label,last_date,date,last_value,new[0:5],8)
+        if update[0]:
+            new_df = pd.DataFrame({'date':[int(date)],
                                 'world_seaborne_trade':[new[0]],
                                 'growth': [new[1]],
                                 'clarksea_idx': [new[2]],
@@ -125,7 +134,15 @@ class clarkson:
                                 'co2_emissions': [new[4]]},index=[0])
             other_data=pd.concat([other_data,new_df],ignore_index=True)
             other_data.to_csv(os.path.join(self.data_path,"clarkson.csv"),index=False)
-        
+        elif update[1]:
+            new_df = pd.DataFrame({'date':[int(date)],
+                                'world_seaborne_trade':[new[0]],
+                                'growth': [new[1]],
+                                'clarksea_idx': [new[2]],
+                                'newbuild_price_idx': [new[3]],
+                                'co2_emissions': [new[4]]},index=[0])
+            other_data.iloc[-1] = new_df
+            other_data.to_csv(os.path.join(self.data_path,"clarkson.csv"),index=False)
     def save_graph(self) -> None:
         # 读取已保存数据
         congestion_idx = pd.read_csv(os.path.join(self.data_path,"container_port_congestion_idx.csv"))
