@@ -1,0 +1,26 @@
+{
+    "World Seaborne Trade": {
+        "unit":"bt",
+        "data":[]
+    },
+    "World Seaborne Trade YoY": {
+        "unit":"%",
+        "data":[]
+    },
+    "ClarkSea Index": {
+        "unit":"$/day",
+        "data":[]
+    },
+    "Newbuild Price Index": {
+        "unit":"index",
+        "data":[]
+    },
+    "CO2 Emissions": {
+        "unit":"Million Tonnes",
+        "data":[]
+    },
+    "Container Port Congestion Index": {
+        "unit":"%",
+        "data":[]
+    }
+}
