@@ -12,7 +12,7 @@ class clarkson:
     def __init__(self) -> None:
         self.URL = "https://sin.clarksons.net/home/GetHomeLinksSearch?homeLinkType=2&page=1&pageSize=100&search="
         #指定数据文件保存路径(可选,应当设置为文件路径,默认为工作目录下的clarkson.json文件)
-        self.data_path = "clarkson.json"
+        self.data_path = "clarkson.csv"
         #指定生成的图表路径(可选,应当设置为目录路径,默认生成在工作目录)
         self.graph_path = "."
         #自行设置代理,支持socks或http代理,如http://127.0.0.1:7890
@@ -21,78 +21,49 @@ class clarkson:
             "User-Agent":
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36 Edg/116.0.0.0"
         }
-        #数据文件模板
-        self.template = """
-        {
-            "World Seaborne Trade": {
-                "unit":"bt",
-                "data":[]
-            },
-            "World Seaborne Trade YoY": {
-                "unit":"%",
-                "data":[]
-            },
-            "ClarkSea Index": {
-                "unit":"$/day",
-                "data":[]
-            },
-            "Newbuild Price Index": {
-                "unit":"index",
-                "data":[]
-            },
-            "CO2 Emissions": {
-                "unit":"Million Tonnes",
-                "data":[]
-            },
-            "Container Port Congestion Index": {
-                "unit":"%",
-                "data":[]
-            }
-        }
-        """
 
     def get_data(self) -> dict:
 
         #从html格式数据中提取数值
-        def parser(s: str, date: str) -> dict:
+        def parser(s: str) -> int|float:
             s = s.replace(",", "")
             s = s.replace("(", "")
             s = s.replace(")", "")
             s = s.replace(" ", "")
             data = re.search(
                 r'<b>\s*([0-9.]{0,32})\s*([a-zA-Z%$/]{0,100})\s*</b>', s)
-            return {
-                "date":
-                date,
-                "value":
-                float(data.group(1))
-                if data.group(2).count("$/day") < 1 else int(data.group(1))
-            }
+            if data is None:
+                print("parser error")
+                os._exit(1)
+            return float(data.group(1)) if data.group(2).count("$/day") < 1 else int(data.group(1))
 
         #从网页获取json数据,并转换成dict
         #会根据self.proxy是否为空选择是否使用代理,若不使用代理有无法访问的可能
-        if self.proxy != "":
-            proxy = {"http": self.proxy, "https": self.proxy}
-            data = json.loads(
-                requests.get(self.URL, headers=self.header,
-                             proxies=proxy).text)
-        else:
-            data = json.loads(requests.get(self.URL, headers=self.header).text)
+        try:
+            if self.proxy != "":
+                proxy = {"http": self.proxy, "https": self.proxy}
+                data = json.loads(
+                    requests.get(self.URL, headers=self.header,
+                                proxies=proxy).text)
+            else:
+                data = json.loads(requests.get(self.URL, headers=self.header).text)
+        except:
+            print("request get error")
+            os._exit(1)
 
-        date = datetime.now().strftime(r"%Y%m%d %H:%M:%S")
         return {
             "World Seaborne Trade":
-            parser(data["Results"][0]["Title"], date),
+            parser(data["Results"][0]["Title"]),
             "World Seaborne Trade YoY":
-            parser(data["Results"][1]["Title"], date),
+            parser(data["Results"][1]["Title"]),
             "ClarkSea Index":
-            parser(data["Results"][2]["Title"], date),
+            parser(data["Results"][2]["Title"]),
             "Newbuild Price Index":
-            parser(data["Results"][3]["Title"], date),
+            parser(data["Results"][3]["Title"]),
             "CO2 Emissions":
-            parser(data["Results"][4]["Title"], date),
+            parser(data["Results"][4]["Title"]),
             "Container Port Congestion Index":
-            parser(data["Results"][5]["Title"], date),
+            parser(data["Results"][5]["Title"]),
         }
 
     def save_data(self) -> None:
