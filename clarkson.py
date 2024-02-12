@@ -2,19 +2,20 @@ import json
 import requests
 import os
 import re
-import shutil
+import pandas as pd
+from datetime import timedelta
 from datetime import datetime
 import matplotlib.pylab as plt
-
+import matplotlib.dates as mdates
 
 class clarkson:
 
     def __init__(self) -> None:
         self.URL = "https://sin.clarksons.net/home/GetHomeLinksSearch?homeLinkType=2&page=1&pageSize=100&search="
         #指定数据文件保存路径(可选,应当设置为文件路径,默认为工作目录下的clarkson.json文件)
-        self.data_path = "clarkson.csv"
+        self.data_path = "./data"
         #指定生成的图表路径(可选,应当设置为目录路径,默认生成在工作目录)
-        self.graph_path = "."
+        self.graph_path = "./graph"
         #自行设置代理,支持socks或http代理,如http://127.0.0.1:7890
         self.proxy = ""
         self.header = {
@@ -22,7 +23,7 @@ class clarkson:
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36 Edg/116.0.0.0"
         }
 
-    def get_data(self) -> dict:
+    def get_data(self) -> list:
 
         #从html格式数据中提取数值
         def parser(s: str) -> int|float:
@@ -51,172 +52,144 @@ class clarkson:
             print("request get error")
             os._exit(1)
 
-        return {
-            "World Seaborne Trade":
+        return [
             parser(data["Results"][0]["Title"]),
-            "World Seaborne Trade YoY":
             parser(data["Results"][1]["Title"]),
-            "ClarkSea Index":
             parser(data["Results"][2]["Title"]),
-            "Newbuild Price Index":
             parser(data["Results"][3]["Title"]),
-            "CO2 Emissions":
             parser(data["Results"][4]["Title"]),
-            "Container Port Congestion Index":
-            parser(data["Results"][5]["Title"]),
-        }
+            parser(data["Results"][5]["Title"])]
 
-    def save_data(self) -> None:
-        #如果数据文件不存在,自动生成数据文件并写入模板
-        if not os.path.exists(self.data_path):
-            with open(self.data_path, "w") as f:
-                f.write(self.template)
-
-        #防止程序出bug,备份历史数据
-        shutil.copyfile(self.data_path, self.data_path + ".bak")
-
-        #读取旧数据
-        with open(self.data_path, "r") as f:
-            old = json.load(f)
-
-        #更新数据并写回
-        #只有港口拥堵指数每天更新,其余只在周六更新
-        with open(self.data_path, "w") as f:
-            new = self.get_data()
-            if datetime.now().strftime(r"%a") == "Sat":
-                for key, value in new.items():
-                    old[key]["data"].append(value)
+    def check_update(self,label,lastdate:str,newdate:str,lastvalue,newvalue,interval:int)->bool:
+        last = datetime.strptime(lastdate, r"%Y%m%d")
+        new = datetime.strptime(newdate, r"%Y%m%d")
+        td = timedelta(days=interval)
+        ret1 = False
+        ret2 = False
+        if type(label)==list:
+            if new - last >= td:
+                print(f"[Other data]lastdate: {lastdate} newdate: {newdate}, updating...")
+                ret1 = True
             else:
-                old["Container Port Congestion Index"]["data"].append(
-                    new["Container Port Congestion Index"])
-            json.dump(old, f, indent=4)
+                print(f"[Other data]lastdate: {lastdate} newdate: {newdate}, no update")
+            for i in range(0, len(lastvalue)):
+                if lastvalue[i] != newvalue[i]:
+                    print(f"[{label[i]}]{lastvalue[i]} -> {newvalue[i]}, updating...")
+                    ret2 = True
+        else:
+            if new - last >= td:
+                print(f"[{label}]lastdate: {lastdate} newdate: {newdate}, updating...")
+                ret1 = True
+            else:
+                print(f"[{label}]lastdate: {lastdate} newdate: {newdate}, no update")
 
+            if lastvalue != newvalue:
+                print(f"[{label}]{newvalue} -> {lastvalue}, updating...")
+                ret2 = True
+
+        return ret1 or ret2
+    def save_data(self) -> None:
+        # 读取已保存数据
+        congestion_idx = pd.read_csv(os.path.join(self.data_path,"container_port_congestion_idx.csv"))
+        other_data = pd.read_csv(os.path.join(self.data_path,"clarkson.csv"))
+        
+        # 爬取新数据
+        new = self.get_data()
+        if new is None or len(new)==0:
+            print("get data error")
+            os._exit(1)
+        
+        # 获取日期
+        date = datetime.now().strftime("%Y%m%d")
+        
+        # 处理集装箱港口拥堵指数
+        last_row = congestion_idx.iloc[-1].tolist()
+        last_date = str(int(last_row[0]))
+        last_value = last_row[1]
+        if self.check_update("congestion_idx",last_date,date,last_value,new[5],1):
+            new_df = pd.DataFrame({"date":date,"container_port_congestion_idx":new[5]},index=[0])
+            congestion_idx=pd.concat([congestion_idx,new_df],ignore_index=True)
+            congestion_idx.to_csv(os.path.join(self.data_path,"container_port_congestion_idx.csv"),index=False)
+            
+        # 处理其他数据
+        label = ["World Seaborne Trade","World Seaborne Trade YoY","ClarkSea Index","Newbuild Price Index","CO2 Emissions"]
+        last_row = other_data.iloc[-1].tolist()
+        last_date = str(int(last_row[0]))
+        last_value = last_row[1:]
+        if self.check_update(label,last_date,date,last_value,new[0:5],8):
+            new_df = pd.DataFrame({'date':[date],
+                                'world_seaborne_trade':[new[0]],
+                                'growth': [new[1]],
+                                'clarksea_idx': [new[2]],
+                                'newbuild_price_idx': [new[3]],
+                                'co2_emissions': [new[4]]},index=[0])
+            other_data=pd.concat([other_data,new_df],ignore_index=True)
+            other_data.to_csv(os.path.join(self.data_path,"clarkson.csv"),index=False)
+        
     def save_graph(self) -> None:
+        # 读取已保存数据
+        congestion_idx = pd.read_csv(os.path.join(self.data_path,"container_port_congestion_idx.csv"))
+        other_data = pd.read_csv(os.path.join(self.data_path,"clarkson.csv"))
+        
+        date = [datetime.strptime(str(d), "%Y%m%d") for d in other_data["date"].tolist()]
+        # 设置x轴的主要刻度定位器和格式化器
+        plt.gca().xaxis.set_major_locator(mdates.MonthLocator())
+        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%b"))
+        
+        # 世界海运贸易量以及增长率
+        fig, ax1 = plt.subplots(figsize=(20,10))
+        ax2 = ax1.twinx()
+        ax1.set_title("World Seaborne Trade")
+        ax1.set_xlabel("Date")
+        ax1.set_ylabel("World Seaborne Trade Volume/bt")
+        ax2.set_ylabel("Yoy/%")
+        # 量左轴, 增长率右轴
+        ax1.plot(date,other_data["world_seaborne_trade"], color="black", label="World Seaborne Trade Volume/bt")
+        ax2.plot(date,other_data["growth"], color="blue", label="Yoy/%")
+        fig.legend(loc="lower right",frameon=True,fontsize="large",shadow=True,facecolor="white",edgecolor="black")
+        plt.grid(visible=True)
+        plt.savefig(os.path.join(self.graph_path,"world_seaborne_trade.png"))
+        
+        # 海运指数
+        fig, ax1 = plt.subplots(figsize=(20,10))
+        ax1.set_title("ClarkSea Index")
+        ax1.set_xlabel("Date")
+        ax1.set_ylabel("ClarkSea Index")
+        ax1.plot(date,other_data["clarksea_idx"], color="black", label="ClarkSea Index")
+        plt.grid(visible=True)
+        plt.savefig(os.path.join(self.graph_path,"clarksea_idx.png"))
+        
+        # 新造船指数
+        fig, ax1 = plt.subplots(figsize=(20,10))
+        ax1.set_title("Newbuild Price Index")
+        ax1.set_xlabel("Date")
+        ax1.set_ylabel("Newbuild Price Index")
+        ax1.plot(date,other_data["newbuild_price_idx"], color="black", label="Newbuild Price Index")
+        plt.grid(visible=True)
+        plt.savefig(os.path.join(self.graph_path,"newbuild_price_idx.png"))
+        
+        # co2排放量
+        fig, ax1 = plt.subplots(figsize=(20,10))
+        ax1.set_title("CO2 Emissions")
+        ax1.set_xlabel("Date")
+        ax1.set_ylabel("CO2 Emissions")
+        ax1.plot(date,other_data['co2_emissions'], color="black", label="CO2 Emissions")
+        plt.grid(visible=True)
+        plt.savefig(os.path.join(self.graph_path,"CO2 Emissions.png"))
 
-        #格式化日期,每月和每年只完整显示一次
-        #输入[20230101,20230102,20230201,20230202]
-        #输出[20230101,02,0201,02]
-        def date_format(date: list) -> list:
-            #上次处理的年
-            year = ""
-            #上次处理的月
-            month = ""
-            ret = []
-            for d in date:
-                if d[0:4] == year and d[4:6] == month:
-                    ret.append(d[6:])
-                elif d[0:4] == year:
-                    month = d[4:6]
-                    ret.append(d[4:])
-                else:
-                    year = d[0:4]
-                    month = d[4:6]
-                    ret.append(d)
-            return ret
-
-        #生成折线图
-        def gen_graph(date: list, value: list, title: str, unit: str) -> None:
-            #为了使图表x轴不过于拥挤,使用了截短的日期,但这会导致x轴出现重复值导致图表出错
-            #故使用一个等长的元素不重复列表xmask替代日期作为x轴的值,并使用xsticks函数将日期作为label替代原x轴的值显示在x轴上
-            #从而解决此问题
-            xmask = []
-            for i in range(32, len(date) + 32):
-                xmask.append(str(i))
-            plt.plot(xmask, value, "k.-", label=title + ": " + unit)
-            plt.title(title)
-            plt.xlabel("Date")
-            plt.grid(True)
-            plt.legend(loc="best", frameon=False)
-            for x, y in zip(xmask, value):
-                plt.annotate(str(y),
-                             xy=(x, y),
-                             textcoords='data',
-                             va='baseline',
-                             ha='right')
-            plt.tight_layout()
-            plt.xticks(xmask, date, rotation=-30)
-            plt.savefig(os.path.join(self.graph_path, title + ".png"),
-                        bbox_inches='tight')
-            plt.close()
-
-        #读取并提取数据
-        with open(self.data_path, "r") as f:
-            data = json.load(f)
-
-        for key, value in data.items():
-            #World Seaborne Trade需要特殊处理,其他可以统一处理
-            if key != "World Seaborne Trade" and key != "World Seaborne Trade YoY":
-                date = []
-                values = []
-                unit = value["unit"]
-                for i in value["data"]:
-                    date.append(i["date"].split(" ")[0])
-                    values.append(i["value"])
-                date = date_format(date)
-                gen_graph(date, values, key, unit)
-
-        #处理World Seaborne Trade数据
-
-        date1 = []
-        value1 = []
-        unit1 = data["World Seaborne Trade"]["unit"]
-
-        date2 = []
-        value2 = []
-        unit2 = data["World Seaborne Trade YoY"]["unit"]
-
-        for item in data["World Seaborne Trade"]["data"]:
-            date1.append(item["date"].split(" ")[0])
-            value1.append(item["value"])
-        date1 = date_format(date1)
-
-        for item in data["World Seaborne Trade YoY"]["data"]:
-            date2.append(item["date"].split(" ")[0])
-            value2.append(item["value"])
-        date2 = date_format(date2)
-
-        xmask1 = []
-        xmask2 = []
-        for i in range(32, len(date1) + 32):
-            xmask1.append(str(i))
-        for i in range(32, len(date2) + 32):
-            xmask2.append(str(i))
-
-        #画图
-        fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True)
-        fig.suptitle("World Seaborne Trade")
-        ax1.plot(xmask1,
-                 value1,
-                 "k.-",
-                 label="World Seaborne Trade" + ": " + unit1)
-        ax1.set_ylabel("value/bt")
-        for x, y in zip(xmask1, value1):
-            ax1.annotate(str(y),
-                         xy=(x, y),
-                         textcoords='data',
-                         va='baseline',
-                         ha='right')
-        ax1.grid(True)
-
-        ax2.plot(xmask2, value2, "k.-", label="YoY" + ": " + unit2)
-        ax2.set_xlabel("Date")
-        ax2.set_ylabel("YoY/%")
-        for x, y in zip(xmask2, value2):
-            ax2.annotate(str(y),
-                         xy=(x, y),
-                         textcoords='data',
-                         va='baseline',
-                         ha='right')
-        ax2.grid(True)
-
-        plt.xticks(xmask2, date2, rotation=-30)
-        fig.tight_layout()
-        fig.savefig(os.path.join(self.graph_path,
-                                 "World Seaborne Trade" + ".png"),
-                    bbox_inches='tight')
-
+        # 集装箱港口拥堵指数
+        date = [datetime.strptime(str(d), "%Y%m%d") for d in congestion_idx["date"].tolist()]
+        fig, ax1 = plt.subplots(figsize=(20,10))
+        ax1.set_title("Container Port Congestion Index/%")
+        ax1.set_xlabel("Date")
+        ax1.set_ylabel("Container Port Congestion Index")
+        ax1.plot(date,congestion_idx['container_port_congestion_idx'], color="black", label="Container Port Congestion Index")
+        plt.grid(visible=True)
+        plt.savefig(os.path.join(self.graph_path,"container_port_congestion_idx.png"))
 
 if __name__ == "__main__":
     c = clarkson()
+    print(f"{datetime.now()}: ------start------")
     c.save_data()
     c.save_graph()
+    print(f"{datetime.now()}: ------end------")
