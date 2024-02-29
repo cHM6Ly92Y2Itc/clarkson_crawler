@@ -13,9 +13,9 @@ class clarkson:
     def __init__(self) -> None:
         self.URL = "https://sin.clarksons.net/home/GetHomeLinksSearch?homeLinkType=2&page=1&pageSize=100&search="
         #指定数据文件保存路径(可选,应当设置为文件路径,默认为工作目录下的clarkson.json文件)
-        self.data_path = "data"
+        self.data_path = "/home/momo/data/clarkson/data"
         #指定生成的图表路径(可选,应当设置为目录路径,默认生成在工作目录)
-        self.graph_path = "graph"
+        self.graph_path = "/home/momo/data/clarkson/graph"
         #自行设置代理,支持socks或http代理,如http://127.0.0.1:7890
         self.proxy = "http://127.0.0.1:7890"
         self.header = {
@@ -116,7 +116,7 @@ class clarkson:
             congestion_idx=pd.concat([congestion_idx,new_df],ignore_index=True)
             congestion_idx.to_csv(os.path.join(self.data_path,"container_port_congestion_idx.csv"),index=False)
         elif update[1]:
-            new_df = pd.DataFrame({"date":int(date),"container_port_congestion_idx":new[5]},index=[0])
+            new_df = pd.DataFrame({"date":int(last_date),"container_port_congestion_idx":new[5]},index=[0])
             congestion_idx.iloc[-1] = new_df
             congestion_idx.to_csv(os.path.join(self.data_path,"container_port_congestion_idx.csv"),index=False)
         # 处理其他数据
@@ -124,7 +124,7 @@ class clarkson:
         last_row = other_data.iloc[-1].tolist()
         last_date = str(int(last_row[0]))
         last_value = last_row[1:]
-        update = self.check_update(label,last_date,date,last_value,new[0:5],8)
+        update = self.check_update(label,last_date,date,last_value,new[0:5],7)
         if update[0]:
             new_df = pd.DataFrame({'date':[int(date)],
                                 'world_seaborne_trade':[new[0]],
@@ -135,7 +135,7 @@ class clarkson:
             other_data=pd.concat([other_data,new_df],ignore_index=True)
             other_data.to_csv(os.path.join(self.data_path,"clarkson.csv"),index=False)
         elif update[1]:
-            new_df = pd.DataFrame({'date':[int(date)],
+            new_df = pd.DataFrame({'date':[int(last_date)],
                                 'world_seaborne_trade':[new[0]],
                                 'growth': [new[1]],
                                 'clarksea_idx': [new[2]],
