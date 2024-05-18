@@ -1,4 +1,4 @@
-date,world_seaborne_trade,growth,clarksea_idx,newbuild_price_idx,co2_emissions
+date,world_seaborne_trade,growth,clarksea_idx,newbuild_price_idx,ghg_emissions
 20230624,12.2,1.8,21749,170.9,821.9
 20230701,12.2,1.8,21749,170.9,821.9
 20230708,12.3,2.3,20018,171.3,837.7
@@ -42,3 +42,8 @@ date,world_seaborne_trade,growth,clarksea_idx,newbuild_price_idx,co2_emissions
 20240330,12.6,2.3,25028,183.2,833.4
 20240406,12.6,2.3,23710,183.6,833.4
 20240413,12.6,2.3,24193,183.6,833.4
+20240420,12.6,2.3,24716,183.5,833.4
+20240427,12.6,2.2,24485,183.9,833.4
+20240504,12.6,2.2,25268,184.8,833.4
+20240511,12.6,2.2,26646,185.3,833.4
+20240518,12.6,2.2,26438,186.0,1002.0

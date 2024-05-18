@@ -13,9 +13,9 @@ class clarkson:
     def __init__(self) -> None:
         self.URL = "https://sin.clarksons.net/home/GetHomeLinksSearch?homeLinkType=2&page=1&pageSize=100&search="
         #指定数据文件保存目录
-        self.data_path = ""
+        self.data_path = "data"
         #指定生成的图表目录
-        self.graph_path = ""
+        self.graph_path = "graph"
         #自行设置代理,支持socks或http代理,如http://127.0.0.1:7890
         self.proxy = ""
         self.header = {
@@ -26,19 +26,17 @@ class clarkson:
     def get_data(self) -> list:
 
         #从html格式数据中提取数值
-        def parser(s: str) -> int | float:
+        def parser(s: str) -> float | int:
             s = s.replace(",", "")
             s = s.replace("(", "")
             s = s.replace(")", "")
             s = s.replace(" ", "")
-            data = re.search(
-                r'<b>\s*([0-9.]{0,32})\s*([a-zA-Z%$/]{0,100})\s*</b>', s)
-            if data is None:
+            numbers = re.findall(r'(\d+(?:\.\d+)?)', s.replace(',', ''))
+            if numbers is None:
                 print("parser error")
                 os._exit(1)
-            return float(
-                data.group(1)) if data.group(2).count("$/day") < 1 else int(
-                    data.group(1))
+            return float(numbers[0]) if s.count("$/day") < 1 else int(
+                numbers[0])
 
         #从网页获取json数据,并转换成dict
         #会根据self.proxy是否为空选择是否使用代理,若不使用代理有无法访问的可能
@@ -156,7 +154,7 @@ class clarkson:
         # 处理其他数据
         label = [
             "World Seaborne Trade", "World Seaborne Trade YoY",
-            "ClarkSea Index", "Newbuild Price Index", "CO2 Emissions"
+            "ClarkSea Index", "Newbuild Price Index", "GHG Emissions"
         ]
         last_row = other_data.iloc[-1].tolist()
         last_date = str(int(last_row[0]))
@@ -171,7 +169,7 @@ class clarkson:
                     'growth': [new[1]],
                     'clarksea_idx': [new[2]],
                     'newbuild_price_idx': [new[3]],
-                    'co2_emissions': [new[4]]
+                    'ghg_emissions': [new[4]]
                 },
                 index=[0])
             other_data = pd.concat([other_data, new_df], ignore_index=True)
@@ -185,7 +183,7 @@ class clarkson:
                     'growth': [new[1]],
                     'clarksea_idx': [new[2]],
                     'newbuild_price_idx': [new[3]],
-                    'co2_emissions': [new[4]]
+                    'ghg_emissions': [new[4]]
                 },
                 index=[0])
             other_data.iloc[-1] = new_df
@@ -252,17 +250,17 @@ class clarkson:
         plt.grid(visible=True)
         plt.savefig(os.path.join(self.graph_path, "newbuild_price_idx.png"))
 
-        # co2排放量
+        # ghg排放量
         fig, ax1 = plt.subplots(figsize=(20, 10))
-        ax1.set_title("CO2 Emissions")
+        ax1.set_title("GHG Emissions")
         ax1.set_xlabel("Date")
-        ax1.set_ylabel("CO2 Emissions")
+        ax1.set_ylabel("GHG Emissions")
         ax1.plot(date,
-                 other_data['co2_emissions'],
+                 other_data['ghg_emissions'],
                  color="black",
-                 label="CO2 Emissions")
+                 label="GHG Emissions")
         plt.grid(visible=True)
-        plt.savefig(os.path.join(self.graph_path, "CO2 Emissions.png"))
+        plt.savefig(os.path.join(self.graph_path, "GHG Emissions.png"))
 
         # 集装箱港口拥堵指数
         date = [
