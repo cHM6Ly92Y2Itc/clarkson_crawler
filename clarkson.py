@@ -22,6 +22,9 @@ logging.basicConfig(filename=LOG_PATH,
 DATA_PATH = os.path.join(WORK_DIR, "data")
 #指定生成的图表目录
 GRAPH_PATH = os.path.join(WORK_DIR, "graph")
+# Ensure directories exist
+os.makedirs(DATA_PATH, exist_ok=True)
+os.makedirs(GRAPH_PATH, exist_ok=True)
 #自行设置代理,支持socks或http代理,如http://127.0.0.1:7890
 PROXY = "http://127.0.0.1:7890"
 HEADER = {
