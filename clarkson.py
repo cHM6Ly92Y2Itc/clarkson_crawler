@@ -12,7 +12,7 @@ import logging
 URL = "https://sin.clarksons.net/home/GetHomeLinksSearch?homeLinkType=2&page=1&pageSize=100&search="
 # Get the directory of the current script
 WORK_DIR = os.path.dirname(os.path.abspath(__file__))
-LOG_PATH = os.path.join(WORK_DIR, "log.txt")
+LOG_PATH = os.path.join(WORK_DIR, "clarkson_crawler.log")
 
 # Configure logging
 logging.basicConfig(filename=LOG_PATH,
